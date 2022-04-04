@@ -9,8 +9,8 @@
 <body>
 	<div class="container">
 		<div style="user-select: none;">
-			<input type="file" id="file">
-			<input type="button" id="re" value="再読み込み">
+			<input type="file" id="file" onchange="handler()">
+			<input type="button" id="re" value="再読み込み" onclick="handler()">
 			<div style="display: inline-block;">
 				<input type="checkbox" id="us">
 				<label for="us">透過時のスペースをアンダースコアに置き換える</label>
@@ -27,12 +27,16 @@
 				</label>
 				<div>
 					<div>
-						<input type="color" id="backcolor" value="#0d0d30">
+						<input type="color" id="backcolor" value="#0d0d30" oninput='document.getElementById("textarea").style.backgroundColor=this.value'>
 						<label for="backcolor">背景色</label>
 					</div>
 					<div>
-						<input type="color" id="color" value="#FFFFFF">
+						<input type="color" id="color" value="#FFFFFF" oninput='document.getElementById("textarea").style.color=this.value'>
 						<label for="color">文字色</label>
+					</div>
+					<div>
+						<label for="shadow">文字の影:</label><input type="checkbox" id="shadow" onchange='let t=document.getElementById("textarea");if(this.checked){t.style.textShadow=t.dataset.shadow}else{t.style.textShadow=""}'>
+						<input type="color" value="#000000" oninput='let t=document.getElementById("textarea");if(document.getElementById("shadow").checked)t.style.textShadow=t.dataset.shadow="2px 2px 4px "+this.value'>
 					</div>
 					<div style="margin-top: 1em;">
 						<input type="button" onclick="copy(this)" value="コピー">
@@ -53,7 +57,7 @@ CPU: Intel Xeon E5-2650 v3 (20) @ 3.000GHz
 GPU: 07:00.0 ASPEED Technology, Inc. ASPEED Graphics Family
 Memory: 9638MiB / 15909MiB</div>
 		</div>
-		<div id="textarea" class="textarea" contenteditable="true" spellcheck="false"></div>
+		<div id="textarea" class="textarea" contenteditable="true" spellcheck="false" data-shadow="2px 2px 4px #000000"></div>
 	</div>
 </body>
 <style>
@@ -302,21 +306,23 @@ Memory: 9638MiB / 15909MiB</div>
 		if(!fileselector.files[0])return
 		systemdata = config.textContent.split("\n")
 		let reader = new FileReader();
+		let tmpimg = new Image()
 		reader.onload = function () {
-			img.onload = () => {
-				img.onload = undefined;
+			tmpimg.onload = () => {
+				tmpimg.onload = undefined;
 
 				let canvas = document.createElement('canvas');
 				let ctx = canvas.getContext('2d');
 
-				let scale = 50 / img.width
-				canvas.width = img.width * scale;
-				canvas.height = img.height * scale / 1.8;
+				let raito = tmpimg.height/tmpimg.width
+				canvas.width = 50;
+				canvas.height = 50*(raito/1.8);
+				console.log(raito,tmpimg.height,tmpimg.width)
 
 				ctx.imageSmoothingEnabled = sm.checked
 				ctx.imageSmoothingQuality = "low"
 
-				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+				ctx.drawImage(tmpimg, 0, 0, canvas.width, canvas.height);
 
 				let text = ""
 				let prevc = ""
@@ -341,17 +347,9 @@ Memory: 9638MiB / 15909MiB</div>
 				}
 				textarea.innerHTML = text
 			};
-			img.src = reader.result;
+			tmpimg.src=img.src=reader.result;
 		};
 		reader.readAsDataURL(fileselector.files[0]);
-	}
-	fileselector.onchange = handler
-	document.getElementById("re").onclick=handler
-	document.getElementById("backcolor").oninput = function(){
-		document.body.style.backgroundColor = this.value
-	}
-	document.getElementById("color").oninput = function(){
-		document.body.style.color = this.value
 	}
 </script>
 
