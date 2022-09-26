@@ -37,6 +37,10 @@
 						<input type="number" style="display:table-cell;width: 3em;" id="width" value="50">
 					</div>
 					<div class="row">
+						<label for="bold" class="cell">太文字:</label>
+						<input type="checkbox" id="bold" onchange='t=document.getElementById("textarea");if(this.checked){t.style.fontWeight="bold"}else{t.style.fontWeight=""}'>
+					</div>
+					<div class="row">
 						<label for="shadow" class="cell">文字の影:</label>
 						<span  class="cell">
 							<input type="checkbox" id="shadow" onchange='t=document.getElementById("textarea");if(this.checked){t.style.textShadow=t.dataset.shadow}else{t.style.textShadow=""}'>
