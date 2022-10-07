@@ -23,34 +23,43 @@
 				<label for="file">
 					<div style="height: 10em;flex: 0;aspect-ratio: 1;align-content: flex-start;"><img id="img"></div>
 				</label>
-				<div style="display:table;border-spacing:0.2em 0;margin-top: 0.5em;">
-					<div class="row">
-						<label for="backcolor" class="cell">背景色:</label>
-						<input type="color" class="cell" id="backcolor" value="#0d0d30" oninput='document.getElementById("textarea").style.backgroundColor=this.value'>
-					</div>
-					<div class="row">
-						<label for="color" class="cell">文字色:</label>
-						<input type="color" class="cell" id="color" value="#FFFFFF" oninput='document.getElementById("textarea").style.color=this.value'>
-					</div>
-					<div class="row">
-						<label for="color" class="cell">画像幅:</label>
-						<input type="number" style="display:table-cell;width: 3em;" id="width" value="50">
-					</div>
-					<div class="row">
-						<label for="bold" class="cell">太文字:</label>
-						<input type="checkbox" id="bold" onchange='t=document.getElementById("textarea");if(this.checked){t.style.fontWeight="bold"}else{t.style.fontWeight=""}'>
-					</div>
-					<div class="row">
-						<label for="shadow" class="cell">文字の影:</label>
-						<span  class="cell">
+				<table style="white-space: nowrap;">
+					<tr>
+						<td><label for="backcolor">背景色:</label></td>
+						<td><input type="color" id="backcolor" value="#0d0d30" oninput='document.getElementById("textarea").style.backgroundColor=this.value'></td>
+					</tr>
+					<tr>
+						<td><label for="color">文字色:</label></td>
+						<td><input type="color" id="color" value="#FFFFFF" oninput='document.getElementById("textarea").style.color=this.value'></td>
+					</tr>
+					<tr>
+						<td><label for="color">画像幅:</label></td>
+						<td><input type="number" style="width: 3em;" id="width" value="50"></td>
+					</tr>
+					<tr>
+						<td><label for="bold">太文字:</label></td>
+						<td>
+							<input type="checkbox" id="bold" onchange='t=document.getElementById("textarea");if(this.checked){t.style.fontWeight="bold"}else{t.style.fontWeight=""}'>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="shadow">文字の影:</label></td>
+						<td style="white-space: nowrap;">
 							<input type="checkbox" id="shadow" onchange='t=document.getElementById("textarea");if(this.checked){t.style.textShadow=t.dataset.shadow}else{t.style.textShadow=""}'>
 							<input type="color" value="#000000" oninput='t=document.getElementById("textarea");if(document.getElementById("shadow").checked)t.style.textShadow=t.dataset.shadow="2px 2px 4px "+this.value'>
-						</span>
-						</div>
-					<div style="margin-top: 1em;">
-						<input type="button" onclick="copy(this)" value="コピー">
-					</div>
-				</div>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="userand">ランダム文字:</label></td>
+						<td><input type="checkbox" id="userand" checked></td>
+					</tr>
+					<tr><td colspan="2"><input type="text" id="randchars" value="!&quot;#$%&'()*+,-./0123456789=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]abcdefghijklmnopqrstuvwxyz{|}~"></td></tr>
+					<tr style="margin-top: 1em;">
+						<td>
+							<input type="button" onclick="copy(this)" value="コピー">
+						</td>
+					</tr>
+				</table>
 			</div>
 			<div id="config" class="textarea" contenteditable="true" spellcheck="false" style="flex-grow:100000;">u-haru@u-haru.com
 -----------------
@@ -111,11 +120,11 @@ Memory: 9638MiB / 15909MiB</div>
 	label{
 		user-select: none;
 	}
-	.row{display:table-row}
-	.cell{display:table-cell}
 </style>
 <script>
 	const chars = "@#WM$HB0987654321!baoc+-"
+	const userand = document.getElementById("userand")
+	const randchars = document.getElementById("randchars")
 	const fileselector = document.getElementById("file")
 	const textarea = document.getElementById("textarea")
 	const img = document.getElementById("img")
@@ -150,9 +159,8 @@ Memory: 9638MiB / 15909MiB</div>
 		b.value="コピーしました!"
 		setTimeout(() => b.value = 'コピー', 1000)
 	}
-	function indexfinder(r, g, b,a) {
-		let index = Math.floor((r + g + b)/ 765 * (chars.length - 1))
-		let c = chars[index] || ""
+	function indexfinder(r, g, b, a) {
+		let c = !userand.checked? (chars[Math.floor((r + g + b)/ 765 * (chars.length - 1))] || ""): (randchars.value[Math.floor(Math.random() * (randchars.value.length - 1))] || "")
 		let s = ""
 		let d = 1000
 		colors.forEach(e => {
