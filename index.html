@@ -37,6 +37,10 @@
 						<td><input type="number" style="width: 3em;" id="width" value="50"></td>
 					</tr>
 					<tr>
+						<td><label for="color">文字サイズ:</label></td>
+						<td><input type="number" style="width: 3em;" value="1.6" step="0.1" onchange='t=document.getElementById("textarea");t.style.fontSize=this.value + "rem"'></td>
+					</tr>
+					<tr>
 						<td><label for="bold">太文字:</label></td>
 						<td>
 							<input type="checkbox" id="bold" onchange='t=document.getElementById("textarea");if(this.checked){t.style.fontWeight="bold"}else{t.style.fontWeight=""}'>
@@ -51,7 +55,7 @@
 					</tr>
 					<tr>
 						<td><label for="shadow">同色の影:</label></td>
-						<td style="white-space: nowrap;"><input type="checkbox" id="colorshadow"></td>
+						<td style="white-space: nowrap;"><input type="checkbox" id="colorshadow" checked></td>
 					</tr>
 					<tr>
 						<td><label for="userand">ランダム文字:</label></td>
