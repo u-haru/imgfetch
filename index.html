@@ -59,13 +59,23 @@
 					</tr>
 					<tr>
 						<td><label for="shadow">同色の影:</label></td>
-						<td style="white-space: nowrap;"><input type="checkbox" id="color_shadow" checked></td>
+						<td><input type="checkbox" id="color_shadow" checked></td>
 					</tr>
+				</table>
+				<table style="white-space: nowrap;">
 					<tr>
-						<td><label for="use_rand">ランダム文字:</label></td>
-						<td><input type="checkbox" id="use_rand" checked></td>
+						<td><label for="character">文字:</label></td>
+						<td><select id="character">
+								<option value="rand" selected>文字列から(ランダム)</option>
+								<option value="sort">文字列から(ソート)</option>
+								<option value="def">明るさで変化</option>
+								<option value="square">四角(█)</option>
+					  		</select>
+						</td>
 					</tr>
-					<tr><td colspan="2"><input type="text" id="rand_chars" value="#$%&?@0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"></td></tr>
+					<tr><td><label for="src_string">文字列:</label></td>
+						<td><input type="text" id="src_string" value="#$%&?@0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"></td>
+					</tr>
 					<tr style="margin-top: 1em;">
 						<td>
 							<input type="button" onclick="copy(this)" value="コピー">
@@ -135,8 +145,9 @@ Memory: 9638MiB / 15909MiB</div>
 </style>
 <script>
 	const chars="@#WM$HB0987654321!baoc+-"
-	const use_rand=document.getElementById("use_rand")
-	const rand_chars=document.getElementById("rand_chars")
+	const character=document.getElementById("character")
+	const src_string=document.getElementById("src_string")
+	let src_index=0
 	const file_selector=document.getElementById("file")
 	const textarea=document.getElementById("textarea")
 	const img=document.getElementById("img")
@@ -152,14 +163,14 @@ Memory: 9638MiB / 15909MiB</div>
 	}
 	// イベント処理
 	document.addEventListener('drop', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        file_selector.files=e.dataTransfer.files
+		e.stopPropagation();
+		e.preventDefault();
+		file_selector.files=e.dataTransfer.files
 		handler()
-    });
-    document.addEventListener("dragover", function(e){
-        e.preventDefault();
-    });
+	});
+	document.addEventListener("dragover", function(e){
+		e.preventDefault();
+	});
 	// テキストをコピーする関数
 	function copy(b){
 		if (!textarea.firstChild)return
@@ -194,7 +205,17 @@ Memory: 9638MiB / 15909MiB</div>
 				c=" "
 			}
 		}else{
-			c=!use_rand.checked? (chars[Math.floor((r + g + b)/ 765 * (chars.length - 1))] || ""): (rand_chars.value[Math.floor(Math.random() * (rand_chars.value.length - 1))] || "")
+			switch(character.value){
+				case "rand":
+					c=src_string.value[Math.floor(Math.random()*src_string.value.length)] || "█";break;
+				case "def":
+					c=chars[Math.floor((r + g + b)/ 765 * (chars.length))]; break;
+				case "sort":
+					if(src_index>=src_string.value.length)src_index=0;
+					c=src_string.value[src_index++] || "█"; break;
+				case "square": c="█";break;
+			}
+			
 			let d=255**2
 			colors.forEach(e => {
 				let di=dist(e[0],e[1],e[2],r,g,b)
@@ -212,6 +233,8 @@ Memory: 9638MiB / 15909MiB</div>
 		systemdata=config.textContent.split("\n")
 		let reader=new FileReader();
 		let tmpimg=new Image()
+		src_string.value = src_string.value.replace(/\s+/g, ""); // 空白を削除
+		src_index=0
 		reader.onload=function () {
 			tmpimg.onload=() => {
 				tmpimg.onload=undefined;
@@ -230,6 +253,7 @@ Memory: 9638MiB / 15909MiB</div>
 				let text=""
 				let prevc=""
 				let sumr=0,sumg=0,sumb=0
+				ctx.font = '2px monospace'; // フォントサイズを指定(measure用)
 				for (let y=0; y < canvas.height; y++) {
 					// 1文字目の前に色を指定する(文字は入れない)
 					let i=ctx.getImageData(0, y, 1, 1);
@@ -244,7 +268,19 @@ Memory: 9638MiB / 15909MiB</div>
 							text += `</span><span style="color:${prevc}${color_shadow.checked?"; text-shadow: 0px 0px 10px "+prevc:""}">`
 						}
 						sumr+=i.data[0];sumg+=i.data[1];sumb+=i.data[2]
-						text += r.c
+						text += r.c.replace(/[&'`"<>]/g, 
+							function(match) {
+							  return {
+								'&': '&amp;',
+								"'": '&#x27;',
+								'`': '&#x60;',
+								'"': '&quot;',
+								'<': '&lt;',
+								'>': '&gt;',
+							  }[match]
+							}
+						)
+						for(let i=2;i<=ctx.measureText(r.c).width;i++) x++ // 2文字分以上の幅を持つ文字があるので、その分をスキップする
 					}
 					text += `</span>`
 					text += " "
