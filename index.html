@@ -217,7 +217,7 @@ Memory: 9638MiB / 15909MiB</div>
 				tmpimg.onload=undefined;
 
 				let canvas=document.createElement('canvas');
-				let ctx=canvas.getContext('2d');
+				let ctx=canvas.getContext('2d', { willReadFrequently: true });
 				let raito=tmpimg.height/tmpimg.width
 				canvas.width=document.getElementById("width").value;
 				canvas.height=canvas.width*(raito/1.8);
