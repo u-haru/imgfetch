@@ -80,6 +80,9 @@
 						<td>
 							<input type="button" onclick="copy(this)" value="コピー">
 						</td>
+						<td>
+							<input type="button" onclick="read(this)" value="クリップボードから">
+						</td>
 					</tr>
 				</table>
 			</div>
@@ -165,12 +168,13 @@ Memory: 9638MiB / 15909MiB</div>
 	document.addEventListener('drop', function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		file_selector.files=e.dataTransfer.files
-		handler()
+		file2html(e.dataTransfer.files[0])
+		console.log(e.dataTransfer.files[0])
 	});
 	document.addEventListener("dragover", function(e){
 		e.preventDefault();
 	});
+	
 	// テキストをコピーする関数
 	function copy(b){
 		if (!textarea.firstChild)return
@@ -178,6 +182,23 @@ Memory: 9638MiB / 15909MiB</div>
 	    navigator.clipboard.writeText(copyText).then(() => {
 			b.value="コピーしました!"
 			setTimeout(() => b.value='コピー', 1000)
+	    });
+	}
+	function read(b){
+	    navigator.clipboard.read().then(items => {
+			for(const item of items){
+				for(const type of item.types){
+					if(type.startsWith("image/")){
+						item.getType(type).then(blob => {
+							file2html(blob)
+							b.value="読み込みました!"
+							setTimeout(() => b.value='クリップボードから', 1000)
+							handler()
+						});
+						return
+					}
+				}
+			}
 	    });
 	}
 	// 色から文字と色を決定する関数
@@ -212,9 +233,12 @@ Memory: 9638MiB / 15909MiB</div>
 		}
 		return {c,s}
 	}
-	// 画像を処理する関数
 	function handler() {
-		if(!file_selector.files[0])return
+		file2html(file_selector.files[0]);
+	}
+	// ファイルを処理する関数
+	function file2html(file){
+		if(!file)return
 		systemdata=config.textContent.split("\n")
 		let reader=new FileReader();
 		let tmpimg=new Image()
@@ -282,7 +306,7 @@ Memory: 9638MiB / 15909MiB</div>
 			};
 			tmpimg.src=img.src=reader.result;
 		};
-		reader.readAsDataURL(file_selector.files[0]);
+		reader.readAsDataURL(file);
 	}
 </script>
 </html>
