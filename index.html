@@ -97,7 +97,7 @@ CPU: Intel Xeon E5-2650 v3 (20) @ 3.000GHz
 GPU: 07:00.0 ASPEED Technology, Inc. ASPEED Graphics Family
 Memory: 9638MiB / 15909MiB</div>
 		</div>
-		<div id="textarea" class="textarea" contenteditable="true" spellcheck="false" data-shadow="2px 2px 4px #000000"></div>
+		<div id="textarea" class="textarea" contenteditable="true" spellcheck="false" data-shadow="2px 2px 4px #000000" style="font-family: monospace;white-space: pre;color: white;"></div>
 	</div>
 </body>
 <style>
@@ -174,26 +174,11 @@ Memory: 9638MiB / 15909MiB</div>
 	// テキストをコピーする関数
 	function copy(b){
 		if (!textarea.firstChild)return
-		if (window.getSelection) {
-			let range=document.createRange();
-			range.setStart(textarea.firstChild,0);
-			range.setEnd(textarea.lastChild,textarea.lastChild.length-1);
-			let sel=getSelection();
-			sel.removeAllRanges();
-			sel.addRange(range);
-			document.execCommand('copy');
-			sel.removeAllRanges()
-		} else {
-			let range=document.selection.createRange();
-			range.moveToElementText(textarea);
-			range.collapse();
-			range.moveStart("character", 2);
-			range.moveEnd("character", 3);
-			range.select();
-			document.execCommand('copy');
-		}
-		b.value="コピーしました!"
-		setTimeout(() => b.value='コピー', 1000)
+		let copyText = textarea.outerHTML;
+	    navigator.clipboard.writeText(copyText).then(() => {
+			b.value="コピーしました!"
+			setTimeout(() => b.value='コピー', 1000)
+	    });
 	}
 	// 色から文字と色を決定する関数
 	function indexfinder(r,g,b,a) {
