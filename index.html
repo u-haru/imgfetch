@@ -220,11 +220,12 @@ Memory: 9638MiB / 15909MiB</div>
 		let ctx=canvas.getContext('2d');
 
 		ctx.font = width+'px monospace';
-		let metric=ctx.measureText("M")
-		let fw=metric.actualBoundingBoxLeft+metric.actualBoundingBoxRight
+		let metric=ctx.measureText("A")
+		let fw=metric.width
+		let fh=metric.fontBoundingBoxAscent+metric.fontBoundingBoxDescent
 
 		let h=height+"em"
-		let w=fw+"em"
+		let w=width*(fw/fh)+"em"
 		e.style.visibility=""
 		e.setAttribute("width",w)
 		e.setAttribute("height",h)
