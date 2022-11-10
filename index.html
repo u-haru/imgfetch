@@ -215,20 +215,26 @@ Memory: 9638MiB / 15909MiB</div>
 			${textarea.outerHTML.replace(/font-size.+?;/g,"")}
 			</div><style>foreignObject{overflow:visible}</style></foreignObject></svg>`)
 		e.style.visibility="invisible"
+
+		let canvas=document.createElement('canvas');
+		let ctx=canvas.getContext('2d');
+
+		ctx.font = width+'px monospace';
+		let metric=ctx.measureText("M")
+		let fw=metric.actualBoundingBoxLeft+metric.actualBoundingBoxRight
+
 		let h=height+"em"
-		let w=width*7/16+"em"
+		let w=fw+"em"
 		e.style.visibility=""
 		e.setAttribute("width",w)
 		e.setAttribute("height",h)
 		// window.open(URL.createObjectURL(new Blob([e.outerHTML.replace(/<br>/g, "<br></br>")], {type: "image/svg+xml"})))
 		let image = new Image();
 		image.onload = () => {
-			let canvas=document.createElement('canvas');
 			let c=document.body.insertAdjacentElement('afterbegin',image)
 			canvas.width=image.naturalWidth;
 			canvas.height=image.naturalHeight;
 			console.log(image.width,image.height)
-			let ctx=canvas.getContext('2d');
 			ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 			c.remove()
 			let png = canvas.toDataURL();
